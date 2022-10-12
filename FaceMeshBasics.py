@@ -2,7 +2,7 @@ import cv2
 import mediapipe as mp
 import time
 
-cap = cv2.VideoCapture("Videos/2.mp4",)
+cap = cv2.VideoCapture("http://192.168.0.126:8080/video") # using IP Cam from phone
 pTime = 0
 
 mpDraw = mp.solutions.drawing_utils
