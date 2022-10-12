@@ -1,5 +1,5 @@
 # Research: Driver Drowsiness Detection
-A Reasearch and Development Project
+A Research and Development Project
 
 **A Driver Drowsiness Detection and Alert System Development.**
 
