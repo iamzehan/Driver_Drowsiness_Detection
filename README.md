@@ -36,7 +36,7 @@ These deep learning algorithms are trained on large datasets of driver data to d
 
 
 
-<h3>Following resources will be used to find out more about how these systems are developed.</h3>
+### *** Following resources will be used to find out more about how these systems are developed.
 
 * **IEEE Xplore Digital Library:** A large database of technical journals, conference proceedings, and standards related to electrical engineering, computer science, and other related fields.
 
