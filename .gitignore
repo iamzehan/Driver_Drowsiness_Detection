@@ -1,2 +1,8 @@
 *.mp4 
 .idea 
+
+# Ignore all .md files
+*.md
+
+# Except README.md
+!README.md
