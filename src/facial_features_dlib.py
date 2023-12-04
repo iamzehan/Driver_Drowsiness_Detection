@@ -1,9 +1,9 @@
 import cv2
 
 # Load the pre-trained face and eye cascade classifiers
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
-mouth_cascade = cv2.CascadeClassifier('haarcascade_mcs_mouth.xml')
+face_cascade = cv2.CascadeClassifier('models/haarcascade_frontalface_default.xml')
+eye_cascade = cv2.CascadeClassifier('models/haarcascade_eye.xml')
+mouth_cascade = cv2.CascadeClassifier('models/haarcascade_mcs_mouth.xml')
 
 # Open the video file
 video = cv2.VideoCapture('Videos/3.mp4')
