@@ -1,4 +1,5 @@
 import cv2
+import json
 import mediapipe as mp
 
 
@@ -64,8 +65,10 @@ class FaceMeshDetector:
       cv2.waitKey()
 
 if __name__ == "__main__":
-    # Example usage
-    img = cv2.imread(r"D:\Pictures\1652112428086.jpg")
+    with open('.\config.json', 'r') as config_file:
+        config_data = json.load(config_file)
+    PATH = config_data['IMG_PATH']
+    img = cv2.imread(PATH)
     detector = FaceMeshDetector()
     detector.process_image(img)
     detector.draw_eye_landmarks(img)

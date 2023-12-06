@@ -4,8 +4,6 @@ import json
 # Read the configuration file
 with open('.\config.json', 'r') as config_file:
     config_data = json.load(config_file)
-
-# Access the MongoDB URI
 PATH = config_data['IMG_PATH']
 # Function to calculate Eye Aspect Ratio (EAR) based on facial landmarks
 def calculate_ear_from_landmarks(landmarks):
@@ -28,7 +26,7 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("models\shape_predictor_68_face_landmarks.dat")  # Replace with the actual path
 
 # Example image (replace with your image)
-image = dlib.load_rgb_image(F"{PATH}")  # Replace with the actual path
+image = dlib.load_rgb_image(f"{PATH}")  # Replace with the actual path
 
 # Detect faces in the image
 faces = detector(image)
