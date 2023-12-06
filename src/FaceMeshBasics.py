@@ -18,7 +18,7 @@ while True:
     if results.multi_face_landmarks:
         for faceLms in results.multi_face_landmarks:
             mpDraw.draw_landmarks(img, faceLms, mpFaceMesh.FACEMESH_TESSELATION,
-                                  drawSpec,drawSpec)
+                                            drawSpec)
             for id,lm in enumerate(faceLms.landmark):
                 #print(lm)
                 ih, iw, ic = img.shape

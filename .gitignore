@@ -3,6 +3,6 @@
 *.pdf
 # Ignore all .md files
 *.md
-
+config.json
 # Except README.md
 !README.md
