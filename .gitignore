@@ -1,6 +1,6 @@
 *.mp4 
 .idea 
-
+*.pdf
 # Ignore all .md files
 *.md
 
