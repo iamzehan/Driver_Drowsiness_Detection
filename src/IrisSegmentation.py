@@ -16,7 +16,7 @@ frame_width = int(cap.get(3))
 frame_height = int(cap.get(4)) 
    
 size = (frame_width, frame_height)
-result = cv.VideoWriter('Mask/eye_tracker.mp4',  
+result = cv.VideoWriter('Videos/Mask/eye_tracker.mp4',  
                          cv.VideoWriter_fourcc(*'MP4V'), 
                          10, size) 
 with mp_face_mesh.FaceMesh(
