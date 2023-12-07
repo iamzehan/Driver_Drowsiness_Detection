@@ -31,4 +31,6 @@ while True:
     cv2.putText(img, f'FPS:{int(fps)}', (20, 70), cv2.FONT_HERSHEY_PLAIN,
                 3, (255, 255, 255), 3)
     cv2.imshow("Face Video", img)
-    cv2.waitKey(1)
+    
+    if cv2.waitKey(1) & 0xFF == 27:
+        break
