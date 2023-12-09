@@ -17,7 +17,7 @@ def contours(img):
   contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
   
   # adjust the contour positions to fit a certain location in the flag
-  for i, _ in enumerate(contours[1]):
+  for i in range(len(contours[1])):
     contours[1][i][0][0], contours[1][i][0][1] = contours[1][i][0][0]+22.5, contours[1][i][0][1]+90
   
   # return the contours pixels
