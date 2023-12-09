@@ -63,9 +63,9 @@ def draw(contours_gaza):
     return img
 if __name__ == "__main__":
 	# read the image of the map of Gaza Strip
-    with open("D:\Documents\Obsidian Vault\config.json", 'r') as config_file:
+    with open("config.json", 'r') as config_file:
         config_data = json.load(config_file)
-    PATH = config_data["path"]
+    PATH = config_data["GAZA_PATH"]
     gaza = cv2.imread(PATH)
     contour = contours(gaza)
     bd_x_palestine = draw(contour)
