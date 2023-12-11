@@ -65,5 +65,5 @@ if __name__ == "__main__":
     result = cv2.resize(result, (h//2, w//2))
     cv2.startWindowThread()
     cv2.imshow("Output", result)
-    cv2.imwrite('Outputs/Output_A-tired-man-yawning-behind-the-wheel-of-his-car.png', result)
+    cv2.imwrite('Image Outputs/Output_A-tired-man-yawning-behind-the-wheel-of-his-car.png', result)
     cv2.waitKey(0)
