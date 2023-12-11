@@ -71,6 +71,6 @@ if __name__ == "__main__":
     bd_x_palestine = draw(contour)
     cv2.startWindowThread()
     cv2.imshow('BD x Palestine',bd_x_palestine)
-    cv2.imwrite('Outputs/Gazza.png', bd_x_palestine)
+    cv2.imwrite('Image Outputs/Gazza.png', bd_x_palestine)
     cv2.waitKey(0)
     
