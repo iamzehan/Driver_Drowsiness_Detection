@@ -16,7 +16,7 @@ class FacexHandDetector:
         self.mp_hands = mp.solutions.hands
         self.mp_drawing_styles = mp.solutions.drawing_styles
         self.hands = self.mp_hands.Hands(
-            static_image_mode=True,
+            static_image_mode=False,
             max_num_hands=2,
             min_detection_confidence=0.5,
             min_tracking_confidence=0.3  # Adjusted tracking confidence
@@ -33,14 +33,19 @@ class FacexHandDetector:
         results = self.face_mesh.process(rgb_frame)
         if results.multi_face_landmarks:
             for face_landmarks in results.multi_face_landmarks:
-                self.mp_drawing.draw_landmarks(
-                    image=frame,
-                    landmark_list=face_landmarks,
-                    connections=self.mp_face_mesh.FACEMESH_CONTOURS,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=self.mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=1, circle_radius=1)
-                )
-
+                feature_set = [self.mp_face_mesh.FACEMESH_LEFT_EYE, self.mp_face_mesh.FACEMESH_RIGHT_EYE, self.mp_face_mesh.FACEMESH_LIPS]
+                for feature in feature_set:
+                    self.mp_drawing.draw_landmarks(
+                        image=frame,
+                        landmark_list=face_landmarks,
+                        connections=feature,
+                        landmark_drawing_spec=None,
+                        connection_drawing_spec=self.mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=1, circle_radius=1)
+                    )
+                for id, lm in enumerate(face_landmarks.landmark):
+                    ih, iw, ic = frame.shape
+                    x, y = int(lm.x * iw), int(lm.y * ih)
+                    cv2.circle(frame, center = (x, y), radius= 1, color = (0, 0, 255))
         # Hand LandMarks
         results = self.hands.process(rgb_frame)
         if results.multi_hand_landmarks:
