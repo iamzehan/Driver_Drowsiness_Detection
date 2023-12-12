@@ -6,3 +6,10 @@
 config.json
 # Except README.md
 !README.md
+
+#official mediapipe files
+face_mesh_connections.py
+mp_hands.py
+
+#gitignore
+.gitignore
