@@ -74,8 +74,7 @@ class FacexHandDetector:
         return frame, blank
 
 if __name__ == "__main__":
-    with open("config.json", "r") as config_file:
-        config_data = json.load(config_file)
+    config_data = json.load(open("config.json", "r"))
     VIDEO_PATH = config_data['IP_CAM']["phone"]
     cap = cv2.VideoCapture(VIDEO_PATH)
 
