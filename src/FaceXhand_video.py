@@ -77,7 +77,6 @@ if __name__ == "__main__":
     with open("config.json", "r") as config_file:
         config_data = json.load(config_file)
     VIDEO_PATH = config_data['IP_CAM']["phone"]
-    
     cap = cv2.VideoCapture(VIDEO_PATH)
 
     if not cap.isOpened():
