@@ -154,8 +154,8 @@ class FacexHandDetector:
                 
         #For better visibility of EAR and MOR text
         cv2.rectangle(frame,
-                        pt1=(230, 430),
-                        pt2=(330, 480),
+                        pt1=(230, 435),
+                        pt2=(310, 470),
                         color=(0,0,0),
                         thickness= -1)
         
@@ -199,10 +199,10 @@ class FacexHandDetector:
         
         # mouth height line 
         cv2.line(frame, 
-                pt1=l2,
-                pt2=l4,
-                color=(255,255,255) if mor < self.mor_threshold else (0, 0, 255),
-                thickness = 1)
+                    pt1=l2,
+                    pt2=l4,
+                    color=(255,255,255) if mor < self.mor_threshold else (0, 0, 255),
+                    thickness = 1)
         
         # writing the mor on the screen
         cv2.putText(frame,
