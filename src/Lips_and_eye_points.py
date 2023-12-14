@@ -199,17 +199,20 @@ if __name__ == "__main__":
         exit()
         
     #feeding the frames in a loop
+    pTime = 0
     while True:
         ret, frame = cap.read()
         if not ret:
             break
         result_frame= detector.process_frame(frame,key_points)
+        
         cTime = time.time()
         fps = 1 / (cTime - pTime)
         pTime = cTime
-        cv2.putText(result_frame, f'FPS:{int(fps)}', (20, 70), cv2.FONT_HERSHEY_PLAIN,
-                    3, (255, 255, 255), 3)
         cv2.startWindowThread()
+        cv2.rectangle(result_frame, (15, 60), (70, 72), color=(0, 0, 0), thickness=-1)
+        cv2.putText(result_frame, f'FPS:{int(fps)}', (20, 70), cv2.FONT_HERSHEY_PLAIN,
+                    0.8, (255, 255, 255), 1)
         cv2.imshow("Output", result_frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
