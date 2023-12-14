@@ -5,7 +5,7 @@ import time
 import numpy as np
 import mediapipe as mp
 
-class FacexHandDetector:
+class DriverDrowsiness:
     def __init__(self, max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5):
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_face_mesh = mp.solutions.face_mesh
@@ -210,7 +210,7 @@ if __name__ == "__main__":
     key_points = json.load(open("src/face_mesh_eye_mouth_config.json"))
     
     # initializing the facemesh face detector
-    detector = FacexHandDetector()
+    detector = DriverDrowsiness()
     
     # capturing frames from camera
     cap = cv2.VideoCapture(VIDEO_PATH)
