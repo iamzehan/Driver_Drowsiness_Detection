@@ -37,8 +37,13 @@ class FacexHandDetector:
     
     # calculate length between two points
     def length_calculation(self, face_landmarks, point1, point2, w, h):
-        x_1, y_1 = self.point_finder(face_landmarks, point1, w, h)
-        x_2, y_2 = self.point_finder(face_landmarks, point2, w, h)
+        if face_landmarks:
+            x_1, y_1 = self.point_finder(face_landmarks, point1, w, h)
+            x_2, y_2 = self.point_finder(face_landmarks, point2, w, h)
+        else:
+            x_1, y_1 = point1
+            x_2, y_2 = point2
+            
         return math.sqrt((x_1-x_2)**2 + (y_1 - y_2)**2)
 
     # Function to calculate Eye Aspect Ratio (EAR) based on facial landmarks
@@ -60,6 +65,24 @@ class FacexHandDetector:
         l1,l2,l3,l4 = args 
         mouth_w, mouth_h = self.length_calculation(face_landmarks, l1, l3, w, h), self.length_calculation(face_landmarks, l2, l4, w, h)
         return round(mouth_h/mouth_w, 2)
+    
+    def mid_mouth_open_ratio(self, face_landmarks, w, h, args):
+        # all mouth points
+        for i, l in enumerate(args):
+            args[i] = self.point_finder(face_landmarks, l, w, h)
+        l1, l2, l3, l4 = args
+        # mouth height mid point
+        h_mid = self.mid_point_finder(l2, l4, w, h)
+        # mouth width mid point
+        w_mid = self.mid_point_finder(l1, l3, w, h)
+        mid = self.mid_point_finder(h_mid, w_mid, w, h)
+        
+        max_h = max(self.length_calculation(None, l2, mid, w, h), 
+                        self.length_calculation(None, l4, mid, w, h))
+        max_w = max(self.length_calculation(None, l1, mid, w, h), 
+                        self.length_calculation(None, l3, mid, w, h))
+        return round(max_h/max_w, 2)
+        
     
     # Process the frame with facial key points
     def process_frame(self, frame, key_points):
@@ -133,7 +156,6 @@ class FacexHandDetector:
                 
                 # mouth measures
                 mor = self.mouth_open_ratio(face_landmarks, w, h, lips)
-                
                 # mouth height mid point
                 h_mid = self.mid_point_finder(l2, l4, w, h, face_landmarks)
                 
