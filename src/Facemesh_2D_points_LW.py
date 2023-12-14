@@ -121,6 +121,7 @@ class FacexHandDetector:
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
         process_frame = self.illumination_enhancement(rgb_frame)
+        cv2.imshow("YcBcr", process_frame)
         #get frame height, width and channel
         h, w, c = frame.shape        
         
