@@ -11,6 +11,6 @@ config.json
 face_mesh_connections.py
 mp_hands.py
 face_mesh_eye_mouth_config.json
-#gitignore
 .gitignore
+#ignore activation command
 start.bash
