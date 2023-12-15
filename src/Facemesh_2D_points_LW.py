@@ -6,6 +6,7 @@ import numpy as np
 import mediapipe as mp
 
 class DriverDrowsiness:
+    
     def __init__(self, max_num_faces=1, refine_landmarks=True, min_detection_confidence=0.5, min_tracking_confidence=0.5):
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_face_mesh = mp.solutions.face_mesh
@@ -92,24 +93,17 @@ class DriverDrowsiness:
     def mouth_open_ratio(self,w, h, args):
         l1,l2,l3,l4 = args 
         mouth_w, mouth_h = self.length_calculation(l1, l3, w, h), self.length_calculation(l2, l4, w, h)
-        return round(mouth_h/mouth_w, 2)
+        return mouth_h/mouth_w
     
-    def mid_mouth_open_ratio(self, face_landmarks, w, h, args):
+    def mid_mouth_open_ratio(self, w, h, h_mid, w_mid, args):
         # all mouth points
-        for i, l in enumerate(args):
-            args[i] = self.point_finder(face_landmarks, l, w, h)
         l1, l2, l3, l4 = args
         # mouth height mid point
-        h_mid = self.mid_point_finder(l2, l4, w, h)
-        # mouth width mid point
-        w_mid = self.mid_point_finder(l1, l3, w, h)
         mid = self.mid_point_finder(h_mid, w_mid, w, h)
         
-        max_h = max(self.length_calculation(None, l2, mid, w, h), 
-                        self.length_calculation(None, l4, mid, w, h))
-        max_w = max(self.length_calculation(None, l1, mid, w, h), 
-                        self.length_calculation(None, l3, mid, w, h))
-        return round(max_h/max_w, 2)
+        max_h = self.length_calculation(l2, mid, w, h) + self.length_calculation(l4, mid, w, h)
+        max_w = self.length_calculation(l1, mid, w, h) + self.length_calculation(l3, mid, w, h)
+        return max_h/max_w
         
     
     # Process the frame with facial key points
@@ -127,6 +121,7 @@ class DriverDrowsiness:
         
         # Face Landmarks
         results_face = self.face_mesh.process(process_frame)
+        
         if results_face.multi_face_landmarks:
             #coordinates for inner right eye 
             right_eye_points = [self.point_finder(face_landmarks, kp, w, h) for face_landmarks in results_face.multi_face_landmarks for kp in key_points["right_eye_points"]]
@@ -176,20 +171,21 @@ class DriverDrowsiness:
         # writing EAR on the screen 
         cv2.putText(frame,
                     f"EAR: {ear}", 
-                    (240, 450),
+                    (240, 430),
                     cv2.FONT_HERSHEY_PLAIN,
                     0.8,
                     color = (0,255,0) if ear > self.ear_threshold else (0, 0, 255),
                     thickness=1)
         
-        # mouth measures
-        mor = self.mouth_open_ratio(w, h, lips)
         # mouth height mid point
         h_mid = self.mid_point_finder(l2, l4, w, h)
         
         # mouth width mid point
         w_mid = self.mid_point_finder(l1, l3, w, h)
-
+        
+        # mouth measures
+        mor = round((self.mouth_open_ratio(w, h, lips) + self.mid_mouth_open_ratio(w, h, h_mid, w_mid, lips))/2, 2)
+        
         # mouth width line
         cv2.line(frame, 
                     pt1=l1,
@@ -207,7 +203,7 @@ class DriverDrowsiness:
         # writing the mor on the screen
         cv2.putText(frame,
                     f"MOR: {mor}",
-                    (240, 470), 
+                    (240, 450), 
                     cv2.FONT_HERSHEY_PLAIN, 
                     0.8, 
                     color = (0,255,0) if mor < self.mor_threshold else (0, 0, 255),
