@@ -388,7 +388,7 @@ if __name__ == "__main__":
             if not ret:
                 break
     
-            result_frame = detector.process_frame(frame,key_points)
+            result_frame = detector.process_frame(frame, key_points)
             cTime = time.time()
             fps = 1 / (cTime - pTime)
             pTime = cTime
