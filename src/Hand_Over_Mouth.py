@@ -21,6 +21,8 @@ class DriverDrowsiness:
             min_tracking_confidence=min_tracking_confidence,
             
         )
+        self.last_mor = []
+        
         # threshold for mouth and eye opening ratio
         self.mor_threshold = 0.6
         self.ear_threshold = 0.25
@@ -30,7 +32,7 @@ class DriverDrowsiness:
         self.mp_drawing_styles = mp.solutions.drawing_styles
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
-            max_num_hands=2,
+            max_num_hands=1,
             min_detection_confidence= min_detection_confidence,
             min_tracking_confidence=min_tracking_confidence,
             model_complexity=1 # Adjusted tracking confidence
@@ -121,7 +123,36 @@ class DriverDrowsiness:
             + self.length_calculation(l3, mid)
         return approx_h/approx_w
         
-    
+    def calculate_slope(self, x1, y1, x2, y2):
+        if (x2-x1)>0:
+            return (y2 - y1) / (x2 - x1)
+        else:
+            return 0
+
+    def check_intersection(self, line1, line2):
+        (x1, y1), (x2, y2) = line1
+        (x3, y3), (x4, y4) = line2
+
+        m1 = self.calculate_slope(x1, y1, x2, y2)
+        m2 = self.calculate_slope(x3, y3, x4, y4)
+
+        # Check if lines are parallel
+        if m1 == m2:
+            return False
+
+        # Calculate the y-intercepts
+        b1 = y1 - m1 * x1
+        b2 = y3 - m2 * x3
+
+        # Calculate the x-coordinate of the intersection point
+        x_intersect = (b2 - b1) / (m1 - m2)
+
+        # Check if the intersection point is within the line segments
+        if min(x1, x2) <= x_intersect <= max(x1, x2) and min(x3, x4) <= x_intersect <= max(x3, x4):
+            return True
+        else:
+            return False
+
     # Process the frame with facial key points
     def process_frame(self, frame, key_points):
         # Resize frame for faster processing (adjust as needed)
@@ -164,8 +195,14 @@ class DriverDrowsiness:
                         for kp in key_points["lips"]
                     ]
             l1, l2, l3, l4 = lips
-        
-        
+            
+            nose_to_chin = [
+                self.point_finder(face_landmarks, kp, w, h) 
+                    for face_landmarks in results_face.multi_face_landmarks 
+                        for kp in key_points["nose_to_chin"]
+                ]
+            nch1, nch2 = nose_to_chin
+
             # all feature points
             feature_points = left_eye_points+right_eye_points+lips
                     
@@ -211,6 +248,7 @@ class DriverDrowsiness:
                         if ear > self.ear_threshold 
                         else (0, 0, 255),
                         thickness=1)
+            
             
             # mouth height mid point
             h_mid = self.mid_point_finder(l2, l4)
@@ -267,25 +305,65 @@ class DriverDrowsiness:
                     thickness=1)
         
         
-        # --------------------------- HANDS LANDMARKS -----------------------------
-        
-        hand_kp = [5, 9, 13, 17]
-        
-        results_hands = self.hands.process(rgb_frame)
-        if results_hands.multi_hand_landmarks:
-            hand_points = [
-                    self.point_finder(hand_landmarks, kp, w, h) 
-                        for hand_landmarks in results_hands.multi_hand_landmarks 
-                            for kp in hand_kp
-                    ]
-            
+            # --------------------------- HANDS LANDMARKS -----------------------------
 
-        if int(self.length_calculation(l2, hand_points[0]))<50:
-            cv2.circle(frame,
-                    center= l2,
-                    radius=int(self.length_calculation(l2, hand_points[0])),
-                    color=(0,255,0),
-                    thickness=-1)
+            results_hands = self.hands.process(rgb_frame)
+            if results_hands.multi_hand_landmarks:
+                hand_points = [
+                        self.point_finder(hand_landmarks, kp, w, h) 
+                            for hand_landmarks in results_hands.multi_hand_landmarks 
+                                for kp in key_points["hand_keypoints"]
+                        ]
+                try:
+                    for i in range(1,len(hand_points)):
+                        if (ear < self.ear_threshold ) \
+                        and (
+                            self.check_intersection(nose_to_chin,
+                                                    [hand_points[0],
+                                                    hand_points[i]])
+                            ):    
+                            
+                            
+                            # drawing the intersecting lines
+                            cv2.line(frame,
+                                pt1=nch1,
+                                pt2=nch2,
+                                color=(0,0,255),
+                                thickness = 1)
+                            
+                            cv2.line(frame, 
+                                    pt1=hand_points[0],
+                                    pt2=hand_points[i],
+                                    color=(0,0,255),
+                                    thickness = 1)
+                            
+                            # index knuckle
+                            cv2.circle(frame,
+                            center= hand_points[0],
+                            radius=2,
+                            color=(0,255,0),
+                            thickness=-1)
+                            
+                            # any finger tip that intersects
+                            cv2.circle(frame,
+                            center= hand_points[i],
+                            radius=2,
+                            color=(0,255,0),
+                            thickness=-1)
+                            
+                            cv2.putText(frame,
+                            f"Status: Yawning!!",
+                            (160, 400), 
+                            cv2.FONT_HERSHEY_PLAIN, 
+                            2, 
+                            color = (0,0,255),
+                            thickness=2)
+                            break
+                        else:
+                            continue
+                    
+                except Exception as e:
+                    print(f"Error: {e}")
 
         return frame
 
@@ -300,12 +378,18 @@ if __name__ == "__main__":
     # getting facial key points, tailored to our needs
     key_points = json.load(open("src/face_mesh_eye_mouth_config.json"))
     
-    # initializing the facemesh face detector
-    
-    
+    # # image 
+    # img = cv2.imread("Attatchments\A-tired-man-yawning-behind-the-wheel-of-his-car.png")
+    # detector = DriverDrowsiness()
+    # result_frame = detector.process_frame(img,key_points)
+    # cv2.startWindowThread()
+    # cv2.imshow("Output: ", result_frame)
+    # if cv2.waitKey(0) & 0xFF == ord('q'):
+    #     cv2.destroyAllWindows()
+    #     exit()
+        
     # capturing frames from camera
     cap = cv2.VideoCapture(VIDEO_PATH)
-    
     
     #feeding the frames in a loop
     if cap.isOpened():
@@ -315,9 +399,8 @@ if __name__ == "__main__":
             ret, frame = cap.read()
             if not ret:
                 break
-            
-            result_frame= detector.process_frame(frame,key_points)
-            
+    
+            result_frame = detector.process_frame(frame,key_points)
             cTime = time.time()
             fps = 1 / (cTime - pTime)
             pTime = cTime
