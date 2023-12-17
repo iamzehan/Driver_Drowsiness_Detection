@@ -1,19 +1,26 @@
 import cv2
 import json
 import time
+import numpy as np
 import mediapipe as mp
 from utils.Image_Enhance import Enhance
 from utils.Caclulations import Calculate
+from utils.Custom_Keypoints import KeyPoints
 from utils.draw import Draw
 
 class DriverDrowsiness:
     
     def __init__(self, max_num_faces=1, refine_landmarks=True,
-                 min_detection_confidence=0.5, min_tracking_confidence=0.5):
-        # face mesh functionalities
-        self.Enhance = Enhance()
-        self.Calculate = Calculate()
-        self.Draw = Draw()
+                 min_detection_confidence=0.5, min_tracking_confidence=0.5,
+                 mor_threshold = 0.6, ear_threshold = 0.25) -> None:
+        
+        # Custom utils package
+        self.Enhance = Enhance() # used for enhancing image
+        self.Calculate = Calculate() # used for calculations
+        self.KeyPoints = KeyPoints() # used for cutom facial and hand landmarks
+        self.Draw = Draw() # used for drawings in the frame
+        
+        # Mediapipe face mesh functionalities
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_face_mesh = mp.solutions.face_mesh
         self.drawing_spec = self.mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
@@ -27,8 +34,8 @@ class DriverDrowsiness:
         )
         
         # threshold for mouth and eye opening ratio
-        self.mor_threshold = 0.6
-        self.ear_threshold = 0.25
+        self.mor_threshold = mor_threshold
+        self.ear_threshold = ear_threshold
         
         # Mediapipe hands functionalities
         self.mp_hands = mp.solutions.hands
@@ -43,13 +50,14 @@ class DriverDrowsiness:
         )
 
   # Process the frame with facial key points
-    def process_frame(self, frame, key_points):
-        # Resize frame for faster processing (adjust as needed)
+    def process_frame(self, frame: np.array, frame_size = (480, 480)) -> np.array:
         
-        frame = cv2.resize(frame, (480, 480))
+        # Resize frame for faster processing (adjust as needed)
+        frame = cv2.resize(frame, frame_size)
         
         # Convert to RGB for MediaPipe models
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        
         # adjust brightness & contrast
         try:
             process_frame = self.Enhance.illumination_enhancement(rgb_frame)
@@ -67,7 +75,7 @@ class DriverDrowsiness:
             right_eye_points = [
                 self.Calculate.point_finder(face_landmarks, kp, w, h) 
                     for face_landmarks in results_face.multi_face_landmarks 
-                        for kp in key_points["right_eye_points"]
+                        for kp in self.KeyPoints.RIGHT_EYE
                 ]
             
             
@@ -75,7 +83,7 @@ class DriverDrowsiness:
             left_eye_points = [
                 self.Calculate.point_finder(face_landmarks, kp, w, h) 
                     for face_landmarks in results_face.multi_face_landmarks 
-                        for kp in key_points["left_eye_points"]
+                        for kp in self.KeyPoints.LEFT_EYE
                 ]
             
             
@@ -83,14 +91,14 @@ class DriverDrowsiness:
             lips = [
                 self.Calculate.point_finder(face_landmarks, kp, w, h) 
                     for face_landmarks in results_face.multi_face_landmarks 
-                        for kp in key_points["lips"]
+                        for kp in self.KeyPoints.LIPS
                     ]
             l1, l2, l3, l4 = lips
             
             nose_to_chin = [
                 self.Calculate.point_finder(face_landmarks, kp, w, h) 
                     for face_landmarks in results_face.multi_face_landmarks 
-                        for kp in key_points["nose_to_chin"]
+                        for kp in self.KeyPoints.NOSE_TO_CHIN
                 ]
 
             # all feature points
@@ -139,7 +147,7 @@ class DriverDrowsiness:
                 hand_points = [
                         self.Calculate.point_finder(hand_landmarks, kp, w, h) 
                             for hand_landmarks in results_hands.multi_hand_landmarks 
-                                for kp in key_points["hand_keypoints"]
+                                for kp in self.KeyPoints.HANDS
                         ]
                 
                 try:
@@ -169,11 +177,8 @@ if __name__ == "__main__":
     # getting the path from the file
     VIDEO_PATH = config_data['IP_CAM']["phone"]
     
-    # getting facial key points, tailored to our needs
-    key_points = json.load(open("src/config/config.json"))
-    
-    cap = cv2.VideoCapture(VIDEO_PATH)
-    
+    cap = cv2.VideoCapture("Videos/3.mp4")
+
     #feeding the frames in a loop
     if cap.isOpened():
         pTime = 0
@@ -183,7 +188,7 @@ if __name__ == "__main__":
             if not ret:
                 break
     
-            result_frame = detector.process_frame(frame, key_points)
+            result_frame = detector.process_frame(frame)
             cTime = time.time()
             fps = 1 / (cTime - pTime)
             pTime = cTime
