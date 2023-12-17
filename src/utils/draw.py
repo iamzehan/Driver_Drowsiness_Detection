@@ -4,8 +4,8 @@ class Draw:
     def __init__(self) -> None:
         self.mor_threshold = 0.6
         self.ear_threshold = 0.25
-    
-    def draw_eye_property(self, ear, frame, left_eye_points, right_eye_points):
+        
+    def draw_eye_features(self, ear, frame, left_eye_points, right_eye_points):
 
         lp1, lp4 = left_eye_points[0:4:3]
         rp1, rp4 = right_eye_points[0:4:3]
@@ -44,8 +44,9 @@ class Draw:
                     if ear > self.ear_threshold 
                     else (0, 0, 255),
                     thickness=1)
-        return frame
-    def draw_mouth_property(self, mor, frame, lips):
+
+    
+    def draw_mouth_features(self, mor, frame, lips):
         l1, l2, l3, l4 = lips
         # mouth width line
         cv2.line(frame, 
@@ -77,7 +78,8 @@ class Draw:
                     thickness=1)
         
         
-        return frame
+        
+    
     def draw_intersect(self, i, frame, nose_to_chin, hand_points):
         nch1, nch2 = nose_to_chin
         # drawing the intersecting lines
@@ -115,4 +117,37 @@ class Draw:
         color = (0,0,255),
         thickness=2)
         
-        return frame
+    
+    def draw_all(self, frame, feature_points, center):
+        # drawing all the features
+        for point in feature_points:
+            cv2.circle(frame,
+                        center = point,
+                        radius= 1,
+                        color = (0, 255, 0),
+                        thickness=-1)
+            
+        # drawing the approximate mid point
+        cv2.circle(frame,
+                center = center, 
+                radius= 1, 
+                color = (0, 255, 0),
+                thickness=1)
+    
+    def draw_fps_count(self, frame, fps):
+        # for visibility of the FPS count
+            cv2.rectangle(frame,
+                          (15, 60),
+                          (70, 72),
+                          color=(0, 0, 0),
+                          thickness=-1)
+            
+            # Writing the fps count 
+            cv2.putText(frame,
+                        f'FPS:{int(fps)}',
+                        (20, 70),
+                        cv2.FONT_HERSHEY_PLAIN,
+                        0.8,
+                        (255, 255, 255),
+                        1)
+            cv2.imshow("Output", frame)
