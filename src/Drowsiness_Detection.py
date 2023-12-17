@@ -4,6 +4,7 @@ import time
 import mediapipe as mp
 from utils.Image_Enhance import Enhance
 from utils.Caclulations import Calculate
+from utils.draw import Draw
 
 class DriverDrowsiness:
     
@@ -12,6 +13,7 @@ class DriverDrowsiness:
         # face mesh functionalities
         self.Enhance = Enhance()
         self.Calculate = Calculate()
+        self.Draw = Draw()
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_face_mesh = mp.solutions.face_mesh
         self.drawing_spec = self.mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
@@ -67,7 +69,7 @@ class DriverDrowsiness:
                     for face_landmarks in results_face.multi_face_landmarks 
                         for kp in key_points["right_eye_points"]
                 ]
-            rp1, rp2, rp3, rp4, rp5, rp6 = right_eye_points
+            
             
             # coordinates for inner left eye
             left_eye_points = [
@@ -75,7 +77,7 @@ class DriverDrowsiness:
                     for face_landmarks in results_face.multi_face_landmarks 
                         for kp in key_points["left_eye_points"]
                 ]
-            lp1, lp2, lp3, lp4, lp5, lp6 = left_eye_points
+            
             
             # coordinates point for inner lips
             lips = [
@@ -90,8 +92,7 @@ class DriverDrowsiness:
                     for face_landmarks in results_face.multi_face_landmarks 
                         for kp in key_points["nose_to_chin"]
                 ]
-            nch1, nch2 = nose_to_chin
-            
+
             # all feature points
             feature_points = left_eye_points+right_eye_points+lips
                     
@@ -102,46 +103,10 @@ class DriverDrowsiness:
             # overall EAR
             ear = round(min(ear_left, ear_right), 2)
                     
-            #For better visibility of EAR and MOR text
-            cv2.rectangle(frame,
-                            pt1=(230, 410),
-                            pt2=(320, 460),
-                            color=(0,0,0),
-                            thickness= -1)
-            
-            # left eye width line
-            cv2.line(frame,
-                        pt1=lp1,
-                        pt2=lp4,
-                        color=(255,255,255) 
-                        if ear > self.ear_threshold 
-                        else (0, 0, 255), 
-                        thickness = 1)
-            
-            # right eye width line
-            cv2.line(frame,
-                        pt1=rp1,
-                        pt2=rp4,
-                        color=(255,255,255) 
-                        if ear > self.ear_threshold 
-                        else (0, 0, 255),
-                        thickness = 1)
-            
-            # writing EAR on the screen 
-            cv2.putText(frame,
-                        f"EAR: {ear}", 
-                        (240, 430),
-                        cv2.FONT_HERSHEY_PLAIN,
-                        0.8,
-                        color = (0,255,0) 
-                        if ear > self.ear_threshold 
-                        else (0, 0, 255),
-                        thickness=1)
-            
+            frame = self.Draw.draw_eye_property(ear, frame, left_eye_points, right_eye_points)
             
             # mouth height mid point
             h_mid = self.Calculate.mid_point_finder(l2, l4)
-            
             # mouth width mid point
             w_mid = self.Calculate.mid_point_finder(l1, l3)
             
@@ -149,50 +114,23 @@ class DriverDrowsiness:
             mor = round(max(self.Calculate.mouth_open_ratio(args=lips), 
                         self.Calculate.mid_mouth_open_ratio(h_mid, w_mid, lips)), 2)
             
-            # mouth width line
-            cv2.line(frame, 
-                        pt1=l1,
-                        pt2=l3,
-                        color=(255,255,255) 
-                        if mor < self.mor_threshold 
-                        else (0, 0, 255),
-                        thickness = 1)
+            #drawing mouth features
+            frame = self.Draw.draw_mouth_property(mor, frame, lips)
             
-            # mouth height line 
-            cv2.line(frame, 
-                        pt1=l2,
-                        pt2=l4,
-                        color=(255,255,255) 
-                        if mor < self.mor_threshold 
-                        else (0, 0, 255),
-                        thickness = 1)
-            
-            # writing the mor on the screen
-            cv2.putText(frame,
-                        f"MOR: {mor}",
-                        (240, 450), 
-                        cv2.FONT_HERSHEY_PLAIN, 
-                        0.8, 
-                        color = (0,255,0) 
-                        if mor < self.mor_threshold 
-                        else (0, 0, 255),
-                        thickness=1)
-            
-            # drawing all the features
+             # drawing all the features
             for point in feature_points:
                 cv2.circle(frame,
                             center = point,
                             radius= 1,
                             color = (0, 255, 0),
                             thickness=-1)
-            
+                
             # drawing the approximate mid point
             cv2.circle(frame,
                     center = self.Calculate.mid_point_finder(h_mid, w_mid), 
                     radius= 1, 
                     color = (0, 255, 0),
                     thickness=1)
-            
             
             # --------------------------- HANDS LANDMARKS -----------------------------
 
@@ -213,41 +151,8 @@ class DriverDrowsiness:
                                                     hand_points[i]])
                             ):    
                             
-                            
-                            # drawing the intersecting lines
-                            cv2.line(frame,
-                                pt1=nch1,
-                                pt2=nch2,
-                                color=(0,0,255),
-                                thickness = 1)
-                            
-                            cv2.line(frame, 
-                                    pt1=hand_points[0],
-                                    pt2=hand_points[i],
-                                    color=(0,0,255),
-                                    thickness = 1)
-                            
-                            # index knuckle
-                            cv2.circle(frame,
-                            center= hand_points[0],
-                            radius=2,
-                            color=(0,255,0),
-                            thickness=-1)
-                            
-                            # any finger tip that intersects
-                            cv2.circle(frame,
-                            center= hand_points[i],
-                            radius=2,
-                            color=(0,255,0),
-                            thickness=-1)
-                            
-                            cv2.putText(frame,
-                            f"Status: Yawning!!",
-                            (160, 400), 
-                            cv2.FONT_HERSHEY_PLAIN, 
-                            2, 
-                            color = (0,0,255),
-                            thickness=2)
+                            frame = self.Draw.draw_intersect(i, frame, nose_to_chin, hand_points)
+
                             break
                         else:
                             continue
