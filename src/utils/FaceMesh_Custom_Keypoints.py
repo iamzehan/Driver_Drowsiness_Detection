@@ -1,4 +1,4 @@
-from .Caclulations import Calculate
+from .Caculations import Calculate
 class KeyPoints:
     def __init__(self) -> None:
         self.LEFT_EYE = [362, 385, 387, 263, 373, 380]
