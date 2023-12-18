@@ -160,4 +160,3 @@ class DriverDrowsiness:
             self.draw_all(frame, feature_points, center_mouth)
                     
         return frame
-

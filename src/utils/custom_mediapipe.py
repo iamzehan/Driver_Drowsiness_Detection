@@ -65,4 +65,3 @@ class Points:
                         for kp in parts
                 ]
         return tuple(points)
-    
