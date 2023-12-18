@@ -1,3 +1,4 @@
+import time
 import random 
 from utils.drawing import Draw
 from utils.preprocess import Preprocess,Enhance
@@ -48,6 +49,7 @@ class DriverDrowsiness:
         self.mor_threshold = mor_threshold
         self.ear_threshold = ear_threshold
         self.last_mor = float('-inf')
+        
         # custom frame size
         self.frame_size = frame_size
         
@@ -65,7 +67,7 @@ class DriverDrowsiness:
         return mor < self.mor_threshold
 
   # Process the frame with facial key points
-    def process_frame(self, frame):
+    def process_frame(self, frame, collect_data=False):
         # Resize frame for faster processing (adjust as needed)
         frame = self.resize(frame, self.frame_size)
         
@@ -88,7 +90,7 @@ class DriverDrowsiness:
             #coordinates for inner right eye 
             
             right_eye_points = self.get_points(results_face, self.RIGHT_EYE, w, h)
-            
+            right_eye_flatten = self.get_points(results_face, self.RIGHT_EYE, w, h, flatten=True)
             # coordinates for inner left eye
             left_eye_points = self.get_points(results_face, self.LEFT_EYE, w, h)
             
@@ -127,7 +129,7 @@ class DriverDrowsiness:
             self.last_mor = mor if mor>self.mor_threshold else self.last_mor
             
             # --------------------------- HANDS LANDMARKS -----------------------------
-
+            hand = None
             results_hands = self.get_hand_landmarks(process_frame)
             if results_hands:
                 hand_points = self.get_points(results_hands, self.HANDS, w, h)
@@ -142,7 +144,9 @@ class DriverDrowsiness:
                             ):    
                             mor = round(random.uniform(self.mor_threshold, self.last_mor),2)
                             self.draw_intersect(index_finger_mcp, finger_tip, frame, nose_to_chin)
-
+                            print(index_finger_mcp)
+                            hand = list(index_finger_mcp)+list(finger_tip)
+                            
                             break
                         else:
                             continue
@@ -160,5 +164,11 @@ class DriverDrowsiness:
 
             # draw all features
             self.draw_all(frame, feature_points, center_mouth)
-                    
+            
+            if collect_data:
+                return frame, right_eye_flatten, left_eye_points, hand, lips, h_mid, w_mid, ear, mor
+        
         return frame
+        
+        
+            
