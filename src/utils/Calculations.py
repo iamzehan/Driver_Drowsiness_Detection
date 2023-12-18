@@ -2,11 +2,6 @@ import math
 
 class Calculate:
     
-    # find the actual coordinates of the point
-    def point_finder(self, face_landmarks, point, w, h):
-        return (int(face_landmarks.landmark[point].x*w),
-                int(face_landmarks.landmark[point].y*h))
-    
     # mid point finder
     def mid_point_finder(self, point1, point2):
         x1, y1 = point1

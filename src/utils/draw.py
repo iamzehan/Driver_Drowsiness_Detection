@@ -5,7 +5,7 @@ class Draw:
         self.mor_threshold = 0.6
         self.ear_threshold = 0.25
         
-    def draw_eye_features(self, ear, frame, left_eye_points, right_eye_points):
+    def draw_eye_features(self, EyeOpen, ear, frame, left_eye_points, right_eye_points):
 
         lp1, lp4 = left_eye_points[0:4:3]
         rp1, rp4 = right_eye_points[0:4:3]
@@ -21,7 +21,7 @@ class Draw:
                     pt1=lp1,
                     pt2=lp4,
                     color=(255,255,255) 
-                    if ear > self.ear_threshold 
+                    if EyeOpen
                     else (0, 0, 255), 
                     thickness = 1)
         
@@ -30,7 +30,7 @@ class Draw:
                     pt1=rp1,
                     pt2=rp4,
                     color=(255,255,255) 
-                    if ear > self.ear_threshold 
+                    if EyeOpen
                     else (0, 0, 255),
                     thickness = 1)
         
@@ -41,19 +41,19 @@ class Draw:
                     cv2.FONT_HERSHEY_PLAIN,
                     0.8,
                     color = (0,255,0) 
-                    if ear > self.ear_threshold 
+                    if EyeOpen 
                     else (0, 0, 255),
                     thickness=1)
 
     
-    def draw_mouth_features(self, mor, frame, lips):
+    def draw_mouth_features(self, Yawning, mor, frame, lips):
         l1, l2, l3, l4 = lips
         # mouth width line
         cv2.line(frame, 
                     pt1=l1,
                     pt2=l3,
                     color=(255,255,255) 
-                    if mor < self.mor_threshold 
+                    if not Yawning
                     else (0, 0, 255),
                     thickness = 1)
         
@@ -62,7 +62,7 @@ class Draw:
                     pt1=l2,
                     pt2=l4,
                     color=(255,255,255) 
-                    if mor < self.mor_threshold 
+                    if not Yawning
                     else (0, 0, 255),
                     thickness = 1)
         

@@ -2,13 +2,13 @@ import json
 import cv2 
 import time
 from utils.draw import Draw
-from Drowsiness_Detection import DriverDrowsiness
+from detection import DriverDrowsiness
 
 if __name__ == "__main__":
     
     # reading the config file to get camera path
     config_data = json.load(open("config.json", "r"))
-    
+    keypoints = json.load(open('src\\config\\config.json'))
     # getting the path from the file
     VIDEO_PATH = config_data['IP_CAM']["phone"]
     
@@ -18,18 +18,22 @@ if __name__ == "__main__":
     #feeding the frames in a loop
     if cap.isOpened():
         pTime = 0
-        detector = DriverDrowsiness()
+        try:
+            detector = DriverDrowsiness(keypoints=keypoints)
+            draw = Draw()
+        except Exception as e:
+            print({e})
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
-    
+            
             result_frame = detector.process_frame(frame)
             
             cTime = time.time()
             fps = 1 / (cTime - pTime)
             pTime = cTime
-            Draw().draw_fps_count(result_frame,fps)
+            draw.draw_fps_count(result_frame,fps)
             cv2.startWindowThread()
             
             if cv2.waitKey(1) & 0xFF == ord('q'):
