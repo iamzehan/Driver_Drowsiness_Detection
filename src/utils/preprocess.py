@@ -1,6 +1,11 @@
 import cv2
 import numpy as np
 
+"""
+The Enhance class is single handedly responsible for the preprocessing of input frames
+From converting color formats, resizing frames to the illumination process, everything is handled here.
+"""
+
 class Enhance:
     def bgr_to_rgb(self, img):
         return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

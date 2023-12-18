@@ -1,5 +1,16 @@
 import math
 
+"""
+function mid_point_finder, returns the midpoint between two points.
+function length_calculation, returns the distance between two points.
+function eye_aspect_ratio, calculates and returns the Eye Aspect Ratio of an eye.
+function mouth_open_ratio, calculates and return Mouth Open Ratio.
+function mid_mouth_open_ratio, calculates and returns the Approximate Mouth Open ratio.
+function calculate_slope, calculates the slope of a line
+function check_intersection, checks the intersection between to lines and returns a boolean value.
+
+"""
+
 class Calculate:
     
     # mid point finder
@@ -15,7 +26,7 @@ class Calculate:
         return math.sqrt((x_1-x_2)**2 + (y_1 - y_2)**2)
 
     # Function to calculate Eye Aspect Ratio (EAR) based on facial landmarks
-    def calculate_ear_from_landmarks(self, args):
+    def eye_aspect_ratio(self, args):
         
         # Extracting coordinates of the eyes
         p1, p2, p3, p4, p5, p6 = args

@@ -1,9 +1,12 @@
 import json
 import cv2 
 import time
-from utils.draw import Draw
+from utils.drawing import Draw
 from detection import DriverDrowsiness
 
+"""
+This file is responsible for reading video data and processing them to detect drowsiness.
+"""
 if __name__ == "__main__":
     
     # reading the config file to get camera path
@@ -11,7 +14,7 @@ if __name__ == "__main__":
     keypoints = json.load(open('src\\config\\config.json'))
     # getting the path from the file
     VIDEO_PATH = config_data['IP_CAM']["phone"]
-    
+    # VIDEO_PATH = "Videos/3.mp4"
     # capture the video 
     cap = cv2.VideoCapture(VIDEO_PATH)
 
@@ -33,9 +36,8 @@ if __name__ == "__main__":
             cTime = time.time()
             fps = 1 / (cTime - pTime)
             pTime = cTime
-            draw.draw_fps_count(result_frame,fps)
             cv2.startWindowThread()
-            
+            draw.draw_fps_count(result_frame,fps)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
     # if the video doesn't open
