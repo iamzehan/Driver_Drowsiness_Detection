@@ -146,4 +146,4 @@ class Draw:
                         0.8,
                         (255, 255, 255),
                         1)
-            cv2.imshow("Output", frame)
+            

@@ -31,7 +31,7 @@ class Hands:
     def process(self,process_frame):
         return self.hands.process(process_frame).multi_hand_landmarks
     
-class Face:
+class FaceMesh:
     def __init__(self, 
                  max_num_faces=1, 
                  refine_landmarks=True,

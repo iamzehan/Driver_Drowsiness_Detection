@@ -1,8 +1,8 @@
 import random 
 from utils.drawing import Draw
-from utils.preprocess import Enhance
+from utils.preprocess import Preprocess,Enhance
 from utils.calculations import Calculate
-from utils.custom_mediapipe import Points, Face, Hands
+from utils.custom_mediapipe import Points, FaceMesh, Hands
 
 """
 The Driver Drowsiness class leverages on the functionality of the other classes such as 
@@ -19,10 +19,11 @@ class DriverDrowsiness:
                  mor_threshold = 0.6, ear_threshold = 0.25) -> None:
         
         # Custom utils package classes
+        self.Preprocess = Preprocess()
         self.Enhance = Enhance() # used for enhancing image
         self.Calculate = Calculate() # used for calculations
         self.Points = Points() # used for custom facial and hand landmarks
-        self.face_mesh = Face()
+        self.face_mesh = FaceMesh()
         self.hand = Hands()
         self.drawing = Draw() # used for drawings in the frame
         
@@ -30,7 +31,8 @@ class DriverDrowsiness:
         self.get_face_landmarks = self.face_mesh.process
         self.get_hand_landmarks = self.hand.process
         self.illuminate = self.Enhance.illumination_enhancement
-        self.resize = self.Enhance.resize_image
+        self.resize = self.Preprocess.resize_image
+        self.bgr_to_rgb = self.Preprocess.bgr_to_rgb
         self.get_points = self.Points.get_points
         self.mid_point = self.Calculate.mid_point_finder
         self.intersect = self.Calculate.check_intersection
@@ -68,7 +70,7 @@ class DriverDrowsiness:
         frame = self.resize(frame, self.frame_size)
         
         # Convert to RGB for MediaPipe models
-        rgb_frame = self.Enhance.bgr_to_rgb(frame)
+        rgb_frame = self.bgr_to_rgb(frame)
         
         # adjust brightness & contrast
 

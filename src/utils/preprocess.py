@@ -5,13 +5,17 @@ import numpy as np
 The Enhance class is single handedly responsible for the preprocessing of input frames
 From converting color formats, resizing frames to the illumination process, everything is handled here.
 """
-
-class Enhance:
+class Preprocess:
     def bgr_to_rgb(self, img):
         return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
     def rgb_to_ycbcr(self, img):
         return cv2.cvtColor(img, cv2.COLOR_RGB2YCrCb)
+    
+    def resize_image(self, img, frame_size):
+        return cv2.resize(img, frame_size)
+
+class Enhance(Preprocess):
 
     def illumination_enhancement(self, img):
         ycbcr_img = self.rgb_to_ycbcr(img)
@@ -43,6 +47,3 @@ class Enhance:
         enhanced_img = cv2.cvtColor(ycbcr_img, cv2.COLOR_YCrCb2RGB)
         
         return enhanced_img
-
-    def resize_image(self, img, frame_size):
-        return cv2.resize(img, frame_size)
