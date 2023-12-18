@@ -2,7 +2,9 @@ import cv2
 import numpy as np
 
 class Enhance:
-        
+    def bgr_to_rgb(self, img):
+        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    
     def rgb_to_ycbcr(self, img):
         return cv2.cvtColor(img, cv2.COLOR_RGB2YCrCb)
 
@@ -21,7 +23,7 @@ class Enhance:
             return enhanced_img
         else:
             return img
-
+        
     def histogram_equalization(self,img):
         ycbcr_img = self.rgb_to_ycbcr(img)
         y_channel = ycbcr_img[:,:,0]
@@ -36,3 +38,6 @@ class Enhance:
         enhanced_img = cv2.cvtColor(ycbcr_img, cv2.COLOR_YCrCb2RGB)
         
         return enhanced_img
+
+    def resize_image(self, img, frame_size):
+        return cv2.resize(img, frame_size)

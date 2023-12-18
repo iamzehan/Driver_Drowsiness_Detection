@@ -1,10 +1,8 @@
-import cv2
-import numpy as np
-import mediapipe as mp
+from utils.draw import Draw
 from utils.preprocess import Enhance
 from utils.calculations import Calculate
 from utils.custom_mediapipe import Points, Face, Hands
-from utils.draw import Draw
+
 
 class DriverDrowsiness:
     
@@ -32,18 +30,18 @@ class DriverDrowsiness:
         self.HANDS = keypoints["hand_keypoints"]
         
     def EyeFullyOpen(self, ear):
-        return ear>self.ear_threshold
+        return ear > self.ear_threshold
     
     def isYawning(self, mor):
-        return mor>self.mor_threshold
+        return mor > self.mor_threshold
 
   # Process the frame with facial key points
-    def process_frame(self, frame: np.array, frame_size = (480, 480)) -> np.array:
+    def process_frame(self, frame, frame_size = (480, 480)):
         # Resize frame for faster processing (adjust as needed)
-        frame = cv2.resize(frame, frame_size)
+        frame = self.Enhance.resize_image(frame, frame_size)
         
         # Convert to RGB for MediaPipe models
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        rgb_frame = self.Enhance.bgr_to_rgb(frame)
         
         # adjust brightness & contrast
 
