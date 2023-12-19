@@ -147,3 +147,12 @@ class Draw:
                         (255, 255, 255),
                         1)
             
+    def draw_sleepy(self, frame, head_point):
+        cv2.putText(
+                    frame,
+                    f"Wake up", 
+                    head_point,
+                    cv2.FONT_HERSHEY_PLAIN,
+                    2,
+                    color = (0, 0, 255),
+                    thickness=1)
