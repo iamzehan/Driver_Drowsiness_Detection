@@ -1,4 +1,3 @@
-import time
 import random 
 from utils.drawing import Draw
 from utils.preprocess import Preprocess,Enhance
@@ -63,11 +62,11 @@ class DriverDrowsiness:
     def EyeOpen(self, ear):
         return ear > self.ear_threshold
     
-    def Yawning(self, mor):
+    def not_Yawning(self, mor):
         return mor < self.mor_threshold
 
   # Process the frame with facial key points
-    def process_frame(self, frame, collect_data=False):
+    def process_frame(self, frame):
         # Resize frame for faster processing (adjust as needed)
         frame = self.resize(frame, self.frame_size)
         
@@ -86,6 +85,7 @@ class DriverDrowsiness:
         
         # Face Landmarks
         results_face = self.get_face_landmarks(process_frame)
+        
         if results_face:
             #coordinates for inner right eye 
             
@@ -125,7 +125,7 @@ class DriverDrowsiness:
                         self.MID_MOR(h_mid, w_mid, lips)),
                         2)
             eye_open = self.EyeOpen(ear)
-            yawning = self.Yawning(mor)
+            not_yawning = self.not_Yawning(mor)
             self.last_mor = mor if mor>self.mor_threshold else self.last_mor
             
             # --------------------------- HANDS LANDMARKS -----------------------------
@@ -144,9 +144,6 @@ class DriverDrowsiness:
                             ):    
                             mor = round(random.uniform(self.mor_threshold, self.last_mor),2)
                             self.draw_intersect(index_finger_mcp, finger_tip, frame, nose_to_chin)
-                            print(index_finger_mcp)
-                            hand = list(index_finger_mcp)+list(finger_tip)
-                            
                             break
                         else:
                             continue
@@ -160,15 +157,102 @@ class DriverDrowsiness:
             self.draw_eyes(eye_open, ear, frame, left_eye_points, right_eye_points)
             
             #drawing mouth features
-            self.draw_mouth(yawning, mor, frame, lips)
+            self.draw_mouth(not_yawning, mor, frame, lips)
 
             # draw all features
             self.draw_all(frame, feature_points, center_mouth)
+        
+            return frame
+
+    # ----------------------------------------------- DATA COLLECTION ------------------------------------
+    # Process the frame with facial key points
+    def get_data(self, id, timeStamp, frame):
+        # Resize frame for faster processing (adjust as needed)
+        idx = [id, timeStamp]
+        frame = self.resize(frame, self.frame_size)
+        
+        # Convert to RGB for MediaPipe models
+        rgb_frame = self.bgr_to_rgb(frame)
+        
+        # adjust brightness & contrast
+
+        process_frame = self.illuminate(rgb_frame)
+
             
-            if collect_data:
-                return frame, right_eye_flatten, left_eye_points, hand, lips, h_mid, w_mid, ear, mor
+        #get frame height, width and channel
+        h, w = self.frame_size      
         
-        return frame
+        # --------------------------- FACE LANDMARKS -----------------------------
         
-        
+        # Face Landmarks
+        results_face = self.get_face_landmarks(process_frame)
+        if results_face:
+            #coordinates for inner right eye 
+            right_eye_points = self.get_points(results_face, self.RIGHT_EYE, w, h)
+            right_eye_flatten = idx+self.get_points(results_face, self.RIGHT_EYE, w, h, flatten=True)
+            # coordinates for inner left eye
+            left_eye_points = self.get_points(results_face, self.LEFT_EYE, w, h)
+            left_eye_flatten = idx+self.get_points(results_face, self.LEFT_EYE, w, h, flatten=True)
             
+            # coordinates point for inner lips
+            lips = self.get_points(results_face, self.LIPS, w, h)
+            
+            l1, l2, l3, l4 = lips
+            
+            # coordinates point for nose to chin
+            nose_to_chin = self.get_points(results_face, self.NOSE_TO_CHIN, w, h)
+            
+            # individual EAR
+            ear_left = self.EAR(args= left_eye_points)
+            ear_right = self.EAR(args= right_eye_points)
+            
+            # overall EAR
+            ear = round(min(ear_left, ear_right), 2)
+            eye_open = self.EyeOpen(ear)
+            
+            # mouth height mid point
+            h_mid = self.mid_point(l2, l4)
+            h_mid_flatten = [i for i in h_mid]
+            # mouth width mid point
+            w_mid = self.mid_point(l1, l3)
+            w_mid_flatten = [i for i in w_mid]
+            
+            lips_flatten = idx+self.get_points(results_face, self.LIPS, w, h, flatten=True)+h_mid_flatten+w_mid_flatten
+            # mouth measures
+            mor = round(max(self.MOR(args=lips), 
+                        self.MID_MOR(h_mid, w_mid, lips)),
+                        2)
+            not_yawning = self.not_Yawning(mor)
+            
+            self.last_mor = mor if mor>self.mor_threshold else self.last_mor
+            
+            # --------------------------- HANDS LANDMARKS -----------------------------
+            hands_flatten = None
+            results_hands = self.get_hand_landmarks(process_frame)
+            if results_hands:
+                hand_points = self.get_points(results_hands, self.HANDS, w, h)
+                index_finger_mcp, finger_tips = hand_points[0], hand_points[1:]
+                try:
+                    for finger_tip in finger_tips:
+                        if not eye_open \
+                        and (
+                            self.intersect(nose_to_chin,
+                                            (index_finger_mcp,
+                                                finger_tip))
+                            ):    
+                            mor = round(random.uniform(self.mor_threshold, self.last_mor),2)
+                            
+                            hands_flatten = idx+list(index_finger_mcp)+list(finger_tip)
+                            
+                            break
+                        else:
+                            continue
+                    
+                except Exception as e:
+                    print(f"Error: {e}")
+            try:
+                drowsiness = idx + [ear, mor] + [1 if (not eye_open or not not_yawning) else 0]
+            except Exception as e:
+                print(e)
+            
+            return right_eye_flatten, left_eye_flatten, hands_flatten, lips_flatten, drowsiness
