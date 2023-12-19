@@ -88,7 +88,7 @@ class DriverDrowsiness:
         
         if results_face:
             #coordinates for inner right eye 
-            
+            head_point = self.get_points(results_face, [10], w, h)
             right_eye_points = self.get_points(results_face, self.RIGHT_EYE, w, h)
             right_eye_flatten = self.get_points(results_face, self.RIGHT_EYE, w, h, flatten=True)
             # coordinates for inner left eye
@@ -142,7 +142,7 @@ class DriverDrowsiness:
                                             (index_finger_mcp,
                                                 finger_tip))
                             ):    
-                            mor = round(random.uniform(self.mor_threshold, self.last_mor),2)
+                            mor = 0.7
                             self.draw_intersect(index_finger_mcp, finger_tip, frame, nose_to_chin)
                             break
                         else:
@@ -162,7 +162,7 @@ class DriverDrowsiness:
             # draw all features
             self.draw_all(frame, feature_points, center_mouth)
         
-            return frame
+            return frame, mor, ear, head_point[0]
 
     # ----------------------------------------------- DATA COLLECTION ------------------------------------
     # Process the frame with facial key points
@@ -225,6 +225,7 @@ class DriverDrowsiness:
             not_yawning = self.not_Yawning(mor)
             
             self.last_mor = mor if mor>self.mor_threshold else self.last_mor
+            print(self.last_mor)
             
             # --------------------------- HANDS LANDMARKS -----------------------------
             hands_flatten = None
