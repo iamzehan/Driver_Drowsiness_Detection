@@ -161,8 +161,11 @@ class DriverDrowsiness:
 
             # draw all features
             self.draw_all(frame, feature_points, center_mouth)
-        
+
+            
             return frame, mor, ear, head_point[0]
+        else:
+            return frame
 
     # ----------------------------------------------- DATA COLLECTION ------------------------------------
     # Process the frame with facial key points
