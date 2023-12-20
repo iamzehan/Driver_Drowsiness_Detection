@@ -53,24 +53,21 @@ class FaceMesh:
         return self.face_mesh.process(process_frame).multi_face_landmarks
 
 class Points:    
-    def get_points(self, results, parts, w, h, flatten = False):
+    def get_points(self, results, keypoints, w, h, flatten = False):
         
             # find the actual coordinates of the point
         def point_finder(face_landmarks, point, w, h):
             return (int(face_landmarks.landmark[point].x*w),
                     int(face_landmarks.landmark[point].y*h))
         if flatten:
-            points = []
-            for landmarks in results:
-                for kp in parts:
-                    p = point_finder(landmarks, kp, w, h)
-                    points.append(p[0])
-                    points.append(p[1])
-            return points
+            return [point
+                for landmarks in results
+                for kp in keypoints
+                for point in point_finder(landmarks, kp, w, h)
+            ]
         else:
-            points = [
+            return tuple(
                     point_finder(landmarks, kp, w, h) 
                         for landmarks in results 
-                            for kp in parts
-                    ]
-            return tuple(points)
+                            for kp in keypoints
+            )
