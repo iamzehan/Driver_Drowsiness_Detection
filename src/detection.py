@@ -30,7 +30,6 @@ class DriverDrowsiness:
         # aliasing the functions
         self.get_face_landmarks = self.face_mesh.process
         self.get_hand_landmarks = self.hand.process
-        self.get_angle = self.Calculate.calculate_pitch_angle
         self.illuminate = self.Enhance.illumination_enhancement
         self.resize = self.Preprocess.resize_image
         self.bgr_to_rgb = self.Preprocess.bgr_to_rgb
