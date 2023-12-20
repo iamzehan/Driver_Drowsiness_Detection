@@ -30,6 +30,7 @@ class DriverDrowsiness:
         # aliasing the functions
         self.get_face_landmarks = self.face_mesh.process
         self.get_hand_landmarks = self.hand.process
+        self.get_angle = self.Calculate.calculate_pitch_angle
         self.illuminate = self.Enhance.illumination_enhancement
         self.resize = self.Preprocess.resize_image
         self.bgr_to_rgb = self.Preprocess.bgr_to_rgb
@@ -90,7 +91,7 @@ class DriverDrowsiness:
             #coordinates for inner right eye 
             head_point = self.get_points(results_face, [10], w, h)
             right_eye_points = self.get_points(results_face, self.RIGHT_EYE, w, h)
-            right_eye_flatten = self.get_points(results_face, self.RIGHT_EYE, w, h, flatten=True)
+            
             # coordinates for inner left eye
             left_eye_points = self.get_points(results_face, self.LEFT_EYE, w, h)
             
@@ -161,7 +162,6 @@ class DriverDrowsiness:
 
             # draw all features
             self.draw_all(frame, feature_points, center_mouth)
-
             
             return frame, mor, ear, head_point[0]
         else:
