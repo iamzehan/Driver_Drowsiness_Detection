@@ -149,9 +149,9 @@ class Draw:
             
     def draw_sleepy(self, frame, head_point):
         cv2.rectangle(frame,
-                          (head_point[0] -10, head_point[1]-10),
-                          (head_point[0]+30, head_point[1]+30),
-                          color=(0, 0, 0),
+                          (head_point[0] -8, head_point[1]-10),
+                          (head_point[0]+60, head_point[1]+8),
+                          color=(0, 0, 255),
                           thickness=-1)
         cv2.putText(
                     frame,
