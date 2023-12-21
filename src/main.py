@@ -24,7 +24,7 @@ if __name__ == "__main__":
     keypoints = json.load(open('src\\config\\config.json'))
     
     # getting the path from the file
-    VIDEO_PATH = "http://192.168.0.159:8080//video"
+    VIDEO_PATH = config_data['IP_CAM']["tab"]
     # capture the video 
     cap = cv2.VideoCapture(VIDEO_PATH)
     
