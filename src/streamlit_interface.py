@@ -61,9 +61,10 @@ def main():
             
             # our detector instant for Driver Drowsiness
             drowsiness_detector = DriverDrowsiness(keypoints=keypoints)
+            # our drawing instant for Drawing on frames
             draw = Draw()
             with col2: stop = st.button(":red[🟥]")
-            
+            # starting frame loop
             while True:
                 ret, frame = cap.read()
                 if not ret:
@@ -137,16 +138,17 @@ def main():
 
                 except:
                     result_frame = results
-                    
-                # FPS count
-                cTime = time.time()
-                fps = fps_count(cTime, pTime)
-                pTime = cTime
-                draw.draw_fps_count(result_frame, fps)
-                draw.draw_blink_count(result_frame, eye_blinks)
                 
-                # Display the processed frame in Streamlit
-                video_placeholder.image(result_frame, channels="BGR", use_column_width=True, output_format="JPEG")
+                finally:
+                    # FPS count
+                    cTime = time.time()
+                    fps = fps_count(cTime, pTime)
+                    pTime = cTime
+                    draw.draw_fps_count(result_frame, fps)
+                    draw.draw_blink_count(result_frame, eye_blinks)
+                    
+                    # Display the processed frame in Streamlit
+                    video_placeholder.image(result_frame, channels="BGR", use_column_width=True, output_format="JPEG")
 
         else:
             st.error("Error: Could not open video")
