@@ -47,7 +47,6 @@ class Draw:
                     color = self.get_color(EyeOpen),
                     thickness=1)
 
-    
     def draw_mouth_features(self, Yawning, mor, frame, lips):
         l1, l2, l3, l4 = lips
         # mouth width line
@@ -73,11 +72,10 @@ class Draw:
                     color = self.get_color(Yawning),
                     thickness=1)
         
-        
-        
-    
     def draw_intersect(self, finger_tip, index_finger_mcp, frame, nose_to_chin):
+        
         nch1, nch2 = nose_to_chin
+        
         # drawing the intersecting lines
         cv2.line(frame,
             pt1=nch1,
@@ -131,6 +129,7 @@ class Draw:
                 thickness=1)
     
     def draw_fps_count(self, frame, fps):
+        
         # for visibility of the FPS count
             cv2.rectangle(frame,
                           (15, 60),
@@ -146,13 +145,56 @@ class Draw:
                         0.8,
                         (255, 255, 255),
                         1)
-            
+
+    def draw_blink_count(self, frame, blink_count):
+        
+        # better visibility
+        cv2.rectangle(frame,
+                          (15, 80),
+                          (120, 92),
+                          color=(0, 0, 0),
+                          thickness=-1)
+        
+        # Writing the blink count 
+        cv2.putText(frame,
+                    f'Blink Count:{blink_count}',
+                    (20, 90),
+                    cv2.FONT_HERSHEY_PLAIN,
+                    0.8,
+                    (255, 255, 255),
+                    1)
+    
+    def draw_stress_driving(self, frame, eye_blinks):
+        
+        w = frame.shape[1]
+        
+        # Writing the blink count 
+        if eye_blinks < 21:
+            cv2.putText(frame,
+                        f'You seem Stressed',
+                        (w-100, 40),
+                        cv2.FONT_HERSHEY_PLAIN,
+                        0.8,
+                        (255, 0, 0),
+                        1)
+        elif eye_blinks >= 21:
+            cv2.putText(frame,
+                        f'You are Stressed!',
+                        (w-100, 40),
+                        cv2.FONT_HERSHEY_PLAIN,
+                        0.8,
+                        (0, 0, 255),
+                        1)
+        
     def draw_sleepy(self, frame, head_point):
+        # for better visibility
         cv2.rectangle(frame,
                           (head_point[0] -8, head_point[1]-10),
                           (head_point[0]+60, head_point[1]+8),
                           color=(0, 0, 255),
                           thickness=-1)
+        
+        # Writing the Wake up message
         cv2.putText(
                     frame,
                     f"Wake up", 
@@ -161,3 +203,5 @@ class Draw:
                     0.8,
                     color = (255, 255, 255),
                     thickness=1)
+    
+        
