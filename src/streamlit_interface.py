@@ -142,7 +142,7 @@ def main():
                 finally:
                     # FPS count
                     cTime = time.time()
-                    fps = fps_count(cTime, pTime)
+                    fps = fps_count(cTime, pTime)   
                     pTime = cTime
                     draw.draw_fps_count(result_frame, fps)
                     draw.draw_blink_count(result_frame, eye_blinks)

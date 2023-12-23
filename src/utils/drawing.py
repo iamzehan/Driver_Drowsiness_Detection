@@ -172,7 +172,7 @@ class Draw:
         if eye_blinks < 21:
             cv2.putText(frame,
                         f'You seem Stressed',
-                        (w-100, 40),
+                        (w-150, 40),
                         cv2.FONT_HERSHEY_PLAIN,
                         0.8,
                         (255, 0, 0),
@@ -180,7 +180,7 @@ class Draw:
         elif eye_blinks >= 21:
             cv2.putText(frame,
                         f'You are Stressed!',
-                        (w-100, 40),
+                        (w-150, 40),
                         cv2.FONT_HERSHEY_PLAIN,
                         0.8,
                         (0, 0, 255),
