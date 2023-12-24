@@ -103,7 +103,7 @@ def main():
                     if yawn_count >= 3 and duration_threshold:
                         # now we warn the driver of his sleepiness
                         draw.draw_sleepy(result_frame, head_point)
-                        play_alarm()
+                        # play_alarm()
                         yawn_count = 0
                         
                     else:
