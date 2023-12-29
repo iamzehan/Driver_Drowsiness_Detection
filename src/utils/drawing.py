@@ -163,7 +163,24 @@ class Draw:
                     0.8,
                     (255, 255, 255),
                     1)
-    
+        
+    def draw_yawn_count(self, frame, yawn_count):
+        # better visibility
+        cv2.rectangle(frame,
+                          (15, 100),
+                          (120, 142),
+                          color=(0, 0, 0),
+                          thickness=-1)
+        
+        # Writing the yawn count 
+        cv2.putText(frame,
+                    f'Yawn Count:{yawn_count}',
+                    (20, 110),
+                    cv2.FONT_HERSHEY_PLAIN,
+                    0.8,
+                    (255, 255, 255),
+                    1)
+        
     def draw_stress_driving(self, frame, eye_blinks):
         
         w = frame.shape[1]

@@ -20,7 +20,7 @@ def get_path(options):
 def play_alarm():
     pygame.mixer.init()
     pygame.mixer.music.load("src\Alarm\Alarm10.wav")
-    pygame.mixer.music.play()
+    pygame.mixer.music.play(1)
 
 def main():
     # Streamlit app title and introduction
@@ -52,6 +52,8 @@ def main():
             # yawning constants 
             yawn_duration_threshold = 6 # this is the maximum limit of yawn in seconds
             yawn_count = 0 # counting yawns in a minute
+            yawn_frame_counter = 0
+            MOR_CONSEC_FRAMES = 90
             
             # eye blink constants
             eye_close_duration_threshold = 3 # if the eye is closed for 3 seconds, this keeps track
@@ -89,21 +91,19 @@ def main():
                     
                     # if the subject is yawning
                     if mouth_open:
-                        # Calculate elapsed time yawning
-                        elapsed_time = time.time() - yawn_start_time
-                        # if the elapsed time exceeds our threshold
-                        if elapsed_time >= yawn_duration_threshold:
-                            # then we say our driver is yawning nad we count the yawn
-                            yawn_count +=1
+                        yawn_frame_counter += 1
+                        
                     # if the driver stops yawning or doesn't yawn then we reset the yawn_start_time
                     else:
-                        yawn_start_time = time.time()
+                        if yawn_frame_counter >= MOR_CONSEC_FRAMES:
+                            yawn_count+=1
+                        yawn_frame_counter = 0
                     
                     # now we check if the driver is exceeding the yawn limit within a minute
-                    if yawn_count >= 3 and duration_threshold:
+                    if not mouth_open and yawn_count >= 2 and duration_threshold:
                         # now we warn the driver of his sleepiness
                         draw.draw_sleepy(result_frame, head_point)
-                        # play_alarm()
+                        play_alarm()
                         yawn_count = 0
                         
                     else:
@@ -146,6 +146,7 @@ def main():
                     pTime = cTime
                     draw.draw_fps_count(result_frame, fps)
                     draw.draw_blink_count(result_frame, eye_blinks)
+                    draw.draw_yawn_count(result_frame, yawn_count)
                     
                     # Display the processed frame in Streamlit
                     video_placeholder.image(result_frame, channels="BGR", use_column_width=True, output_format="JPEG")
