@@ -1,8 +1,10 @@
-import streamlit as st
-import json
 import cv2
+import json
 import time
 import pygame
+import numpy as np
+import datetime as dt
+import streamlit as st
 from utils.drawing import Draw
 from detection import DriverDrowsiness
 
@@ -29,6 +31,7 @@ def main():
 
     # Configurations
     keypoints = json.load(open('src\\config\\config.json'))
+    
     options = st.radio("Choose Options", ["IP_CAM", "Webcam"], horizontal=True)
     VIDEO_PATH = get_path(options)
     col1, col2, _ = st.columns(spec=[0.1, 0.1, 0.8], gap = "small")
@@ -154,7 +157,46 @@ def main():
         else:
             st.error("Error: Could not open video")
     else:
+        blank_image = np.zeros((580, 580, 3), dtype=np.uint8)
         st.markdown("Press :green[▶️] to Detect Driver Drowsiness")
+        cv2.putText(blank_image, "No Input", (250, 290), 1, 0.8, (255,255,255), 1)
+        st.image(blank_image)
+
+    
 # Run the Streamlit app
 if __name__ == "__main__":
     main()
+    # Footer design
+    config = json.load(open(".\\config.json"))
+    st.markdown(
+        f"""
+        ___
+        
+        <style>
+            footer {{
+                color: #fff;
+                text-align: center;
+                padding: 1rem;
+                position: relative;
+                bottom: 0;
+                width: 100%;
+            }}
+            a {{
+                color: #fff;
+                text-decoration: none;
+                font-weight: bold;
+            }}
+            a:hover {{
+                text-decoration: underline;
+            }}
+        </style>
+        <footer>
+            <a href="{config["Linkedin"]}" target="_blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="{config["Linkedin"]}" height="20" width="30" /></a>
+            <a href="{config["Github"]}" target="_blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/github.svg" height="20" width="30" /></a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ziaul.karim497@gmail.com" target="_blank"><img align="center" src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Gmail_icon_%282020%29.svg" height="15" width="30" /></a>
+            <br>
+            &copy; {dt.datetime.now().year} Made by - <a href= "https://ziaulkarim.netlify.app/" target="_blank"> Md. Ziaul Karim </a>
+        </footer>
+        """,
+        unsafe_allow_html=True
+    )
