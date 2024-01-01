@@ -2,7 +2,6 @@ import cv2
 import json
 import time
 import pygame
-import numpy as np
 import datetime as dt
 import streamlit as st
 from utils.drawing import Draw
@@ -17,6 +16,14 @@ def get_path(options):
         VIDEO_PATH += "//video"
     elif options== "Webcam":
         VIDEO_PATH=0
+    elif options== "Examples":
+        select = st.selectbox("Select a video Example: ", ["Example 1", "Example 2"])
+        if select == "Example 1":
+            VIDEO_PATH="Examples\\1\\video.mp4"
+        elif select == "Example 2":
+            VIDEO_PATH = "Examples\\2\\video.mp4"
+        else:
+            st.error("Select a video")
     return VIDEO_PATH
 
 def play_alarm():
@@ -32,12 +39,15 @@ def main():
     # Configurations
     keypoints = json.load(open('src\\config\\config.json'))
     
-    options = st.radio("Choose Options", ["IP_CAM", "Webcam"], horizontal=True)
+    options = st.radio("Choose Options", ["IP_CAM", "Webcam", "Examples"], horizontal=True,)
     VIDEO_PATH = get_path(options)
     col1, col2, _ = st.columns(spec=[0.1, 0.1, 0.8], gap = "small")
     with col1: start = st.button("\n :green[▶️]")
        
     if start:
+        st.markdown("""
+                    <div class="blank-image" style="visibility:hidden"></div>
+                    """, unsafe_allow_html=True)
         cap = cv2.VideoCapture(VIDEO_PATH)
         # Display the video stream in Streamlit
         video_placeholder = st.empty()
@@ -45,7 +55,7 @@ def main():
         if cap.isOpened():
             pTime = 0
             mor_threshold = 0.6
-            ear_threshold = 0.25
+            ear_threshold = 0.15
             
             # frame durations 
             start_time = time.time()
@@ -56,7 +66,7 @@ def main():
             yawn_duration_threshold = 6 # this is the maximum limit of yawn in seconds
             yawn_count = 0 # counting yawns in a minute
             yawn_frame_counter = 0
-            MOR_CONSEC_FRAMES = 90
+            MOR_CONSEC_FRAMES = 60
             
             # eye blink constants
             eye_close_duration_threshold = 3 # if the eye is closed for 3 seconds, this keeps track
@@ -157,10 +167,11 @@ def main():
         else:
             st.error("Error: Could not open video")
     else:
-        blank_image = np.zeros((580, 580, 3), dtype=np.uint8)
         st.markdown("Press :green[▶️] to Detect Driver Drowsiness")
-        cv2.putText(blank_image, "No Input", (250, 290), 1, 0.8, (255,255,255), 1)
-        st.image(blank_image)
+        st.markdown("""
+                    <div class="blank-div" style="visibility:visible">No videos</div>
+                    """, 
+                    unsafe_allow_html=True)
 
     
 # Run the Streamlit app
@@ -189,6 +200,17 @@ if __name__ == "__main__":
             a:hover {{
                 text-decoration: underline;
             }}
+            
+            .blank-div {{
+            background-color: black;
+            width: 100%;
+            height: 480px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white; /* set the text color to white for better visibility */
+            font-size: 24px;
+        }}
         </style>
         <footer>
             <a href="{config["Linkedin"]}" target="_blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="{config["Linkedin"]}" height="20" width="30" /></a>
