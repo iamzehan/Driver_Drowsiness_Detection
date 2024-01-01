@@ -168,7 +168,7 @@ class Draw:
         # better visibility
         cv2.rectangle(frame,
                           (15, 100),
-                          (120, 142),
+                          (120, 112),
                           color=(0, 0, 0),
                           thickness=-1)
         
