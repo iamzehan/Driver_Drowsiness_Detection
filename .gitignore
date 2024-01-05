@@ -1,0 +1,35 @@
+.idea 
+_Index_of_Driver Drowsiness Detection.md
+*.pdf
+# Ignore all .md files
+*.md
+config.json
+# Except README.md
+!README.md
+Videos/*
+src/utils/__pycache__/
+src/__pycache__/
+src/utils/Custom_Keypoints.py
+Driver\ Drowsiness\ Detection.canvas
+#official mediapipe files
+face_mesh_connections.py
+mp_hands.py
+data_collect.py
+main.py
+data
+src/config/config.json
+.gitignore
+
+#ignore activation command
+start.bash
+Experiments/
+Image Outputs/
+/README.md
+models/
+src/requirements.txt
+src/packages.txt
+src/README.md
+/requirements.txt
+src/runtime.txt
+/runtime.txt
+Examples
