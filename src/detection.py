@@ -1,7 +1,7 @@
 import random 
 from utils.drawing import Draw
 from utils.preprocess import Preprocess,Enhance
-from utils.calculations import Calculate
+from utils.Calculations import Calculate
 from utils.custom_mediapipe import Points, FaceMesh, Hands
 
 """
