@@ -1,29 +1,40 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from detection import DriverDrowsiness
-import numpy as np
+import cv2
+import os
 import json
+import numpy as np
+import base64
+from detection import DriverDrowsiness as dd
+from fastapi import FastAPI, File 
 
 app = FastAPI(docs_url="/")
 
-keypoints=json.load(open('src\\config\\config.json'))
-detect = DriverDrowsiness(keypoints=keypoints)
+# Facial keypoints
+script_dir = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(script_dir, 'config', 'config.json')
+keypoints = json.load(open(file_path))
+# Facial Landmarks Model
+detect = dd(keypoints=keypoints)
 
-class Payload(BaseModel):
-    image: np.array
-    
-@app.post("/detect/")
-async def get_flower_class(file: Payload.image):
-    result = await detect.process_frame(file.image)
-    if len(result)>1:
+@app.post("/detect/")    
+async def detect_drowsiness(file: bytes = File(...)):
+    image = np.frombuffer(file, np.uint8)
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    result = detect.process_frame(image)
+    try:
         frame, mor, ear, head = result
-        return {
-                "frame":frame,
-                "mor": mor,
-                "ear": ear,
-                "head":head
-                }
-    else:
-        return {
-            "frame": result
-            }
+    except:
+        frame = result
+        mor = None
+        ear = None
+        head = None
+
+    # Encode the image to base64
+    _, frame_encode = cv2.imencode('.jpg', frame)
+    byte_encode = base64.b64encode(frame_encode.tobytes()).decode('utf-8')
+
+    return {
+        "image": byte_encode,
+        "mor": mor,
+        "ear": ear,
+        "head": head
+    }
